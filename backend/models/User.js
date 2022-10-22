@@ -31,6 +31,12 @@ const userSchema = mongoose.Schema(
       type: String,
       required: [true, "Password is Required"],
     },
+    roles: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Role",
+      },
+    ],
     picture: {
       type: String,
       default:
@@ -68,6 +74,7 @@ function validateUser(user) {
     username: Joi.string(),
     email: Joi.string().required().email(),
     password: Joi.string().required(),
+    roles: Joi.array(),
     picture: Joi.string(),
     gender: Joi.string().required(),
     bYear: Joi.number().integer().min(1900).max(2013),

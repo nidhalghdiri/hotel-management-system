@@ -4,23 +4,15 @@ const { readdirSync } = require("fs");
 const dotenv = require("dotenv");
 dotenv.config();
 
-const mongoose = require("mongoose");
-
 const app = express();
 app.use(express.json());
 app.use(cors());
+
+// Setup and require Routes
 readdirSync("./routes").map((r) => app.use("/", require("./routes/" + r)));
 
-mongoose
-  .connect(process.env.DATABASE_URL, {
-    useNewUrlParser: true,
-  })
-  .then(() => {
-    console.log("Database Connected Successfully.");
-  })
-  .catch(() => {
-    console.log("Error Connecting to Database!");
-  });
+// Connection and Inialize Database
+require("./startup/db")();
 
 const PORT = process.env.PORT || 8000;
 app.listen(PORT, () => {

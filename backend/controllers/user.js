@@ -1,20 +1,24 @@
-const { validateEmail, validateUsername } = require("../helpers/validation");
+const { validateUsername } = require("../helpers/validation");
 const { User, validateUser } = require("../models/User");
 const bcrypt = require("bcrypt");
 const { generateToken } = require("../helpers/tokens");
+const { Role } = require("../models/Role");
+
 exports.register = async (req, res) => {
   try {
     // Validate Data Structure
     const { error } = validateUser(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error)
+      return res.status(400).send({ message: error.details[0].message });
 
-    const { first_name, last_name, email, password, gender } = req.body;
+    const { first_name, last_name, email, password, gender, roles } = req.body;
+
     // Validate Existance of Email
     const check = await User.findOne({ email }).exec();
     if (check) {
-      return res
-        .status(400)
-        .send("This Email Already Exist, try diffrent email address");
+      return res.status(400).send({
+        message: "This Email Already Exist, try diffrent email address",
+      });
     }
 
     // Crypt Passowrd
@@ -23,6 +27,7 @@ exports.register = async (req, res) => {
 
     let tempUsername = first_name + last_name;
     let newUsername = await validateUsername(tempUsername);
+
     // Save Data to Database
     const user = await new User({
       first_name,
@@ -33,19 +38,50 @@ exports.register = async (req, res) => {
       gender,
     }).save();
 
-    //Generate Token
-    const token = generateToken({ id: user._id.toString() });
+    if (!user) {
+      return res.status(500).send({ message: "User Cannot Registered" });
+    }
+    // Check if User has roles
+    if (roles) {
+      const userRoles = await Role.find({ name: { $in: roles } });
+      if (!userRoles) {
+        return res
+          .status(500)
+          .send({ message: "User Roles Cannot Registered" });
+      }
+      user.roles = userRoles.map((role) => role._id);
+      const userWithRoles = await user.save();
+      if (!userWithRoles) {
+        return res
+          .status(500)
+          .send({ message: "Somthing Wrong when Setting Roles to user" });
+      }
 
-    // Send Success Response
-    return res.header("x-auth-token", token).status(200).send({
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: user.email,
-      username: user.username,
-      gender: user.gender,
-      token: token,
-      message: "Register Success ! Please Activate your email.",
-    });
+      //Generate Token
+      const token = generateToken({ id: user._id.toString() });
+
+      // Send Success Response
+      return res.header("x-auth-token", token).status(200).send({
+        message: "Register Success ! Please Activate your email.",
+      });
+    } else {
+      const userRole = await Role.findOne({ name: "user" });
+      if (!userRole) {
+        return res.status(500).send({ message: "Cannot Fetch User Role" });
+      }
+      user.roles = [userRole._id];
+      const userWithDefaultRole = await user.save();
+      if (!userWithDefaultRole) {
+        return res
+          .status(500)
+          .send({ message: "Cannot set default role to user" });
+      }
+      //Generate Token
+      const token = generateToken({ id: user._id.toString() });
+      return res.header("x-auth-token", token).status(200).send({
+        message: "Register Success ! Please Activate your email.",
+      });
+    }
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -55,30 +91,43 @@ exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!(email && password)) {
-      return res.status(400).send("All input is required");
+      return res.status(400).send({ message: "جميع الخانات إجبارية" });
     }
-
-    const user = await User.findOne({ email });
+    // Check User Exist or Not
+    const user = await User.findOne({ email }).populate("roles", "-__v");
     if (!user) {
-      return res
-        .status(400)
-        .send("This Email adress you entred is not connected to an account.");
+      return res.status(400).send({
+        message: "البريد الإلكتروني غير صحيح.",
+      });
     }
-
+    // Check Password Validation
     const check = await bcrypt.compare(password, user.password);
     if (!check) {
-      return res.status(400).send("Invalid Credentials. Please try again.");
+      return res
+        .status(400)
+        .send({ message: "البريد الإلكتروني أو كلمة المرور غير صالحة." });
     }
 
+    // Generate Token
     const token = generateToken({ id: user._id.toString() });
 
+    // Fetch Roles of user
+    var authorities = [];
+
+    for (let i = 0; i < user.roles.length; i++) {
+      authorities.push("ROLE_" + user.roles[i].name.toUpperCase());
+    }
+
+    // Send Success response
     res.header("x-auth-token", token).send({
       id: user._id,
       username: user.username,
+      email: user.email,
       first_name: user.first_name,
       last_name: user.last_name,
       token: token,
-      message: "Login Success.",
+      roles: authorities,
+      message: "تم الدخول بنجاح. الرجاء الإنتظار",
     });
   } catch (error) {
     res.status(500).json({ message: error.message });
