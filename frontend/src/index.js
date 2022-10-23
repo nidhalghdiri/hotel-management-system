@@ -9,7 +9,8 @@ import rootReducer from "./reducers";
 
 import "./index.css";
 import App from "./App";
-const store = createStore(rootReducer, composeWithDevTools());
+import store from "./store";
+// const store = createStore(rootReducer, composeWithDevTools());
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(

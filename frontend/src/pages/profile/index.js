@@ -1,52 +1,43 @@
-import React, { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
-// import axios from "axios";
-import AuthService from "../../services/auth.service";
-function Profile() {
-  const [redirect, setRedirect] = useState(null);
-  const [userReady, setUserReady] = useState(false);
-  const [currentUser, setCurrentUser] = useState({ email: "" });
-  useEffect(() => {
-    getUser();
-  }, []);
+import React, { useState } from "react";
+import { connect } from "react-redux";
+import Layout from "../../hoc/layout";
+function Profile(props) {
+  const { user } = props;
 
-  const getUser = () => {
-    const currUser = AuthService.getCurrentUser();
-    if (!currUser) {
-      setRedirect("/login");
-    } else {
-      setCurrentUser(currUser);
-      setUserReady(true);
-      console.log("Current user", currUser);
-    }
-  };
   return (
-    <div>
-      {redirect ? <Navigate to={redirect} /> : null}
-      {userReady ? (
-        <div>
-          <b>Welcome</b>{" "}
-          <span>
-            {currentUser.first_name} {currentUser.last_name}
-          </span>{" "}
-          <br />
-          <b>Username : </b>
-          {currentUser.username}
-          <br />
-          <b>Email : </b>
-          {currentUser.email}
-          <br />
-          <b>Roles</b>
-          <ul>
-            {currentUser.roles &&
-              currentUser.roles.map((role, index) => (
-                <li key={index}>{role}</li>
-              ))}
-          </ul>
-        </div>
-      ) : null}
-    </div>
+    <>
+      <Layout>
+        {user ? (
+          <div>
+            <b>مرحبا </b>{" "}
+            <span>
+              {props.user.first_name} {props.user.last_name}
+            </span>{" "}
+            <br />
+            <b>إسم المستخدم : </b>
+            {props.user.username}
+            <br />
+            <b>البريد الإلكتروني : </b>
+            {props.user.email}
+            <br />
+            <b>الوظيفة :</b>
+            <ul>
+              {props.user.roles &&
+                props.user.roles.map((role, index) => (
+                  <li key={index}>{role}</li>
+                ))}
+            </ul>
+          </div>
+        ) : null}
+      </Layout>
+    </>
   );
 }
-
-export default Profile;
+function mapStateToProps(state) {
+  const { isLoggedIn, user } = state.auth;
+  return {
+    isLoggedIn,
+    user,
+  };
+}
+export default connect(mapStateToProps)(Profile);

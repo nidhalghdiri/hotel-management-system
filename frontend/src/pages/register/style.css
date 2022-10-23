@@ -1,0 +1,22 @@
+.login_container {
+  background: var(--white-color);
+  width: 80vw;
+  padding: 1.2rem;
+  margin: 1rem auto;
+}
+.login_container h1 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 1rem 0;
+}
+
+@media (min-width: 768px) {
+  .login_container {
+    width: 60vw;
+  }
+}
+@media (min-width: 1024px) {
+  .login_container {
+    width: 50vw;
+  }
+}

@@ -1,95 +1,47 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
+import "../App.css";
 import { Col, Row } from "react-bootstrap";
-import { Link } from "react-router-dom";
 import Header from "../components/header";
 import Sidebar from "../components/sidebar";
+import { Navigate } from "react-router-dom";
 
-import AuthService from "../services/auth.service";
+import { connect } from "react-redux";
+import { logout as logoutFunc } from "../actions/auth";
+
 function Layout(props) {
-  const [showModeratorBoard, setShowModeratorBoard] = useState(false);
-  const [showAdminBoard, setShowAdminBoard] = useState(false);
-  const [currentUser, setCurrentUser] = useState(undefined);
+  const { isLoggedIn, user } = props;
 
-  useEffect(() => {
-    getCurrUser();
-  }, []);
-
-  const getCurrUser = () => {
-    const user = AuthService.getCurrentUser();
-
-    if (user) {
-      setCurrentUser(user);
-      setShowModeratorBoard(user.roles.includes("ROLE_MODERATOR"));
-      setShowAdminBoard(user.roles.includes("ROLE_ADMIN"));
-    }
-  };
   const logout = () => {
-    AuthService.logout();
-    setShowModeratorBoard(false);
-    setShowAdminBoard(false);
-    setCurrentUser(undefined);
+    props.dispatch(logoutFunc());
   };
   return (
     <main className="layout">
-      <Row>
-        <Col xs={2} md={2} lg={2} xl={2} className="px-0">
-          {currentUser ? <Sidebar /> : null}
-        </Col>
-        <Col xs={10} md={10} lg={10} xl={10} className="px-0">
-          {currentUser ? (
+      {!isLoggedIn ? <Navigate to={"/login"} /> : null}
+      {user ? (
+        <Row>
+          <Col xs={2} md={2} lg={2} xl={2} className="px-0">
+            <Sidebar />
+          </Col>
+          <Col xs={10} md={10} lg={10} xl={10} className="px-0">
             <Header
-              fullname={`${currentUser.first_name} ${currentUser.last_name}`}
+              fullname={`${user.first_name} ${user.last_name}`}
               logout={logout}
             />
-          ) : null}
-          {/* {currentUser ? (
-        <nav className="navbar navbar-expand navbar-dark bg-dark">
-          <Link to={"/"} className="navbar-brand">
-            Home
-          </Link>
-          <div className="navbar-nav mr-auto">
-            {showModeratorBoard && (
-              <li className="nav-item">
-                <Link to={"/mod"} className="nav-link">
-                  Moderator Board
-                </Link>
-              </li>
-            )}
-            {showAdminBoard && (
-              <li className="nav-item">
-                <Link to={"/admin"} className="nav-link">
-                  Admin Board
-                </Link>
-              </li>
-            )}
-            {currentUser && (
-              <li className="nav-item">
-                <Link to={"/user"} className="nav-link">
-                  User
-                </Link>
-              </li>
-            )}
-          </div>
-
-          <div className="navbar-nav ml-auto">
-            <li className="nav-item">
-              <Link to={"/profile"} className="nav-link">
-                {currentUser.username}
-              </Link>
-            </li>
-            <li className="nav-item">
-              <a href={"/login"} className="nav-link" onClick={logout}>
-                Logout
-              </a>
-            </li>
-          </div>
-        </nav>
-      ) : null} */}
-          {props.children}
-        </Col>
-      </Row>
+            <div className="main">
+              <div className="main_content">{props.children}</div>
+            </div>
+          </Col>
+        </Row>
+      ) : null}
     </main>
   );
 }
+function mapStateToProps(state) {
+  const { isLoggedIn, user } = state.auth;
+  return {
+    isLoggedIn,
+    user,
+  };
+}
 
-export default Layout;
+export default connect(mapStateToProps)(Layout);

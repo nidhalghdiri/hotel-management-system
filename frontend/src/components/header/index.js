@@ -30,9 +30,9 @@ function Header({ fullname, logout, ...props }) {
               <FontAwesomeIcon icon={faUserCircle} size="lg" />
               <span>{fullname}</span>
             </Link>
-            <Link className="nav-link navbar_links" to={"/profile"}>
+            <Link className="nav-link navbar_links" to={"/"}>
               <FontAwesomeIcon icon={faGear} size="lg" />
-              <NavDropdown title="الإعدادات" id="navbarScrollingDropdown">
+              {/* <NavDropdown title="الإعدادات" id="navbarScrollingDropdown">
                 <NavDropdown.Item href="#action3">Action</NavDropdown.Item>
                 <NavDropdown.Item href="#action4">
                   Another action
@@ -41,7 +41,7 @@ function Header({ fullname, logout, ...props }) {
                 <NavDropdown.Item href="#action5">
                   Something else here
                 </NavDropdown.Item>
-              </NavDropdown>
+              </NavDropdown> */}
             </Link>
 
             <Link

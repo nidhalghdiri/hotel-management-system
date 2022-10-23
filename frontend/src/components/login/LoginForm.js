@@ -5,9 +5,12 @@ import * as Yup from "yup";
 import LoginInput from "../inputs/loginInput";
 // import axios from "axios";
 import LoginButton from "../buttons/loginButton";
-import { Navigate } from "react-router-dom";
+import { Navigate, redirect } from "react-router-dom";
 import AuthService from "../../services/auth.service";
 import { withRouter } from "../../hoc/with-router";
+import { connect } from "react-redux";
+import { login as loginFunc } from "../../actions/auth";
+import { clearMessage } from "../../actions/message";
 const loginInfos = {
   email: "",
   password: "",
@@ -34,38 +37,27 @@ function LoginForm(props) {
     password: Yup.string().required("كلمة المرور إجبارية."),
   });
 
+  const { isLoggedIn, message } = props;
+
+  if (isLoggedIn) {
+    return <Navigate to="/profile" />;
+  }
+
   const loginSubmit = async () => {
+    const { dispatch } = props;
     try {
       setError("");
+      dispatch(clearMessage());
       setSuccess("");
       setLoading(true);
-      // const { data } = await axios.post(
-      //   `${process.env.REACT_APP_BACKEND_URL}/login`,
-      //   { email, password }
-      // );
-      // setError("");
-      // setLoading(false);
-      // setSuccess(data.message);
-
-      // const { message, ...rest } = data;
-      // console.log(data);
-      AuthService.login(email, password).then(
-        () => {
+      dispatch(loginFunc(email, password))
+        .then(() => {
           props.router.navigate("/profile");
           window.location.reload();
-        },
-        (error) => {
-          const resMessage =
-            (error.response &&
-              error.response.data &&
-              error.response.data.message) ||
-            error.message ||
-            error.toString();
-          setSuccess("");
-          setError(resMessage);
+        })
+        .catch(() => {
           setLoading(false);
-        }
-      );
+        });
     } catch (error) {
       setLoading(false);
       setSuccess("");
@@ -103,9 +95,9 @@ function LoginForm(props) {
           )}
         </Formik>
         <div>
-          {error && (
+          {message && (
             <p className="login_form_status_message login_form_error">
-              {error}
+              {message}
             </p>
           )}
           {success && (
@@ -127,4 +119,13 @@ function LoginForm(props) {
   );
 }
 
-export default withRouter(LoginForm);
+function mapStateToProps(state) {
+  const { isLoggedIn } = state.auth;
+  const { message } = state.message;
+  return {
+    isLoggedIn,
+    message,
+  };
+}
+
+export default connect(mapStateToProps)(withRouter(LoginForm));
