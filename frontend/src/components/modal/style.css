@@ -1,0 +1,81 @@
+/* .modal_container {
+  height: 90vh;
+} */
+.modal_container-content {
+  height: 100%;
+}
+
+/* ModalHeader style */
+.modal-header {
+  background: var(--color-secondary);
+  color: var(--white-color);
+}
+.modal-header .modal-title {
+  font-weight: 700;
+}
+.modal-header .btn-close {
+  /* margin-right: 80%; */
+  margin: 0;
+}
+
+/* ModalFooter Style */
+.modal_container-footer {
+  width: 100%;
+
+  border: 1px solid #222;
+}
+.modal_container-footer-savebutton {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+}
+.modal_container-footer-closebutton {
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+/* ModalRow Style */
+.modal_row-container {
+  width: 100%;
+  border: 1px solid var(--gris-color);
+  border-radius: 10px;
+}
+
+.modal_row-container .modal_row-title {
+  width: 100%;
+  border-bottom: 1px solid var(--gris-color);
+  padding: 10px;
+  background: var(--bg-secondary);
+}
+.modal_row-container .modal_row-body {
+  width: 100%;
+  padding: 10px;
+}
+
+/* ModalField Style */
+
+.modal_field {
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+}
+.modal_field .modal_field-title {
+  margin: 0 5px;
+}
+.modal_field .modal_field-title span {
+  font-weight: 600;
+}
+.modal_field .modal_field-input {
+  width: 100%;
+  margin: 0 5px;
+}
+.modal_field .modal_field-input input {
+  width: 100%;
+}
+
+.model_result_message  {
+  font-weight: 700;
+  text-align: center;
+}

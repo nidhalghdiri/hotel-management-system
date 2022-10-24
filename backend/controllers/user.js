@@ -17,7 +17,7 @@ exports.register = async (req, res) => {
     const check = await User.findOne({ email }).exec();
     if (check) {
       return res.status(400).send({
-        message: "This Email Already Exist, try diffrent email address",
+        message: "البريد الإلكتروني موجود.",
       });
     }
 
@@ -62,7 +62,13 @@ exports.register = async (req, res) => {
 
       // Send Success Response
       return res.header("x-auth-token", token).status(200).send({
-        message: "Register Success ! Please Activate your email.",
+        first_name: first_name,
+        last_name: last_name,
+        email: email,
+        password: password,
+        gender: gender,
+        roles: roles,
+        message: "تم تسجيل المستخدم بنجاح.",
       });
     } else {
       const userRole = await Role.findOne({ name: "user" });
@@ -79,7 +85,13 @@ exports.register = async (req, res) => {
       //Generate Token
       const token = generateToken({ id: user._id.toString() });
       return res.header("x-auth-token", token).status(200).send({
-        message: "Register Success ! Please Activate your email.",
+        first_name: first_name,
+        last_name: last_name,
+        email: email,
+        password: password,
+        gender: gender,
+        roles: roles,
+        message: "تم تسجيل المستخدم بنجاح.",
       });
     }
   } catch (error) {

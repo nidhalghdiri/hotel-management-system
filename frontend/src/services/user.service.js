@@ -16,13 +16,13 @@ class UserService {
   getAdminBoard() {
     return axios.get(API_URL + "api/test/admin", { headers: authHeader() });
   }
-  register(user) {
+  register(first_name, last_name, email, gender, password) {
     return axios.post(API_URL + "register", {
-      first_name: user.first_name,
-      last_name: user.last_name,
-      email: user.email,
-      gender: user.gender,
-      password: user.password,
+      first_name: first_name,
+      last_name: last_name,
+      email: email,
+      gender: gender,
+      password: password,
     });
   }
 }

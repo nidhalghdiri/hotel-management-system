@@ -11,21 +11,19 @@ function Profile(props) {
           <div>
             <b>مرحبا </b>{" "}
             <span>
-              {props.user.first_name} {props.user.last_name}
+              {user.first_name} {user.last_name}
             </span>{" "}
             <br />
             <b>إسم المستخدم : </b>
-            {props.user.username}
+            {user.username}
             <br />
             <b>البريد الإلكتروني : </b>
-            {props.user.email}
+            {user.email}
             <br />
             <b>الوظيفة :</b>
             <ul>
-              {props.user.roles &&
-                props.user.roles.map((role, index) => (
-                  <li key={index}>{role}</li>
-                ))}
+              {user.roles &&
+                user.roles.map((role, index) => <li key={index}>{role}</li>)}
             </ul>
           </div>
         ) : null}
