@@ -1,0 +1,18 @@
+.navbar_company_name {
+  /* background: #ccc; */
+}
+.navbar_company_name span {
+  margin: 0 12px;
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--black-color);
+}
+.navbar_links {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: var(--black-color);
+}
+.navbar_links span {
+  margin: 0 8px;
+}
